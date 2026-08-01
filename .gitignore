@@ -1,0 +1,28 @@
+# --- Backend / Python ---
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/data/
+backend/ml_pipeline/data/
+backend/ml_pipeline/checkpoints/*
+!backend/ml_pipeline/checkpoints/.gitkeep
+backend/ml_pipeline/outputs/
+backend/.env
+backend/*.db
+
+# --- Frontend / Node ---
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+frontend/coverage/
+frontend/next-env.d.ts
+
+# --- OS / editor ---
+.DS_Store
+.vscode/
+.idea/
+*.log
