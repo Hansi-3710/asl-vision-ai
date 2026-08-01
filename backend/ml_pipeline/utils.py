@@ -92,14 +92,28 @@ def count_flops(model: torch.nn.Module, input_size: tuple) -> dict:
     try:
         from thop import profile
     except ImportError:
-        return {"macs": None, "flops": None, "note": "thop not installed -- run `pip install thop`."}
+        return {
+            "macs": None,
+            "flops": None,
+            "note": "thop not installed -- run `pip install thop`."
+        }
 
-    dummy = torch.randn(1, *input_size)
+    # Put the dummy tensor on the same device as the model
+    device = next(model.parameters()).device
+    dummy = torch.randn(1, *input_size).to(device)
+
     was_training = model.training
     model.eval()
-    macs, _ = profile(model, inputs=(dummy,), verbose=False)
+
+    with torch.no_grad():
+        macs, _ = profile(model, inputs=(dummy,), verbose=False)
+
     model.train(was_training)
-    return {"macs": macs, "flops": macs * 2}
+
+    return {
+        "macs": macs,
+        "flops": macs * 2
+    }
 
 
 @contextmanager

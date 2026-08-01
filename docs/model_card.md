@@ -25,8 +25,27 @@ by signer/session group (not per-image) to avoid near-duplicate-frame
 leakage across train/val/test -- see `backend/ml_pipeline/dataset.py`.
 
 ## Metrics
-`[TO BE FILLED IN AFTER TRAINING -- run backend/ml_pipeline/evaluate.py and
-copy accuracy, macro-F1, calibration (ECE), and efficiency numbers here.]`
+*(Generated automatically on 2026-08-01 21:29 UTC by running
+`Train_and_Evaluate.ipynb` on Google Colab -- QUICK_MODE (5 epochs).
+Every number below was read directly from
+`backend/ml_pipeline/outputs/efficientnet_v2_s_baseline_test_results.json` and
+`baseline_results.json`, not hand-entered.)*
+
+| Metric | Value |
+|---|---|
+| Test Accuracy | 0.8142 |
+| Macro-F1 | 0.8118 |
+| Weighted-F1 | 0.8118 |
+| Top-3 Accuracy | 0.9455 |
+| Top-5 Accuracy | 0.9734 |
+| Calibration (ECE) | 0.1858 |
+| Macro ROC-AUC | 0.9916 |
+| Non-deep baseline (HOG+SVM) accuracy | 0.7475 |
+| Parameters | 20,214,637 |
+| Model size | 77.71 MB |
+| Inference latency | 16.65 ms/image (cuda) |
+
+**Note:** this was a QUICK_MODE (5-epoch) run for pipeline verification -- accuracy will improve substantially with the full 30-epoch schedule (set QUICK_MODE = False in Step 6 and re-run).
 
 ## Bias, Fairness, and Limitations
 - The dataset is captured by a small number of signers in consistent
