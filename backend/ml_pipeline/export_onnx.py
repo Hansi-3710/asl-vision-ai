@@ -1,36 +1,19 @@
 import torch
-import torch.nn as nn
 import torchvision.models as models
-import os
 
 
 MODEL_PATH = "checkpoints/efficientnet_v2_s_baseline/best.pt"
 OUTPUT_PATH = "checkpoints/efficientnet_v2_s_baseline/efficientnet_v2_s.onnx"
 
+
 device = "cpu"
 
 
-class ASLClassifier(nn.Module):
-    def __init__(self, num_classes):
-        super().__init__()
-
-        self.backbone = models.efficientnet_v2_s(
-            weights=None
-        )
-
-        self.backbone.classifier[1] = nn.Linear(
-            self.backbone.classifier[1].in_features,
-            num_classes
-        )
-
-    def forward(self, x):
-        return self.backbone(x)
-
-
-
-NUM_CLASSES = 29   # <-- use your actual number
-
-model = ASLClassifier(NUM_CLASSES)
+# Original training architecture
+model = models.efficientnet_v2_s(
+    weights=None,
+    num_classes=29
+)
 
 
 checkpoint = torch.load(
@@ -39,10 +22,19 @@ checkpoint = torch.load(
 )
 
 
-if "model_state_dict" in checkpoint:
-    model.load_state_dict(checkpoint["model_state_dict"])
-else:
-    model.load_state_dict(checkpoint)
+state_dict = checkpoint["model_state_dict"]
+
+
+# Remove "backbone." prefix
+new_state_dict = {}
+
+for key, value in state_dict.items():
+    if key.startswith("backbone."):
+        key = key.replace("backbone.", "")
+    new_state_dict[key] = value
+
+
+model.load_state_dict(new_state_dict)
 
 
 model.eval()
@@ -70,8 +62,12 @@ torch.onnx.export(
     input_names=["image"],
     output_names=["prediction"],
     dynamic_axes={
-        "image": {0: "batch"},
-        "prediction": {0: "batch"}
+        "image": {
+            0: "batch"
+        },
+        "prediction": {
+            0: "batch"
+        }
     }
 )
 
