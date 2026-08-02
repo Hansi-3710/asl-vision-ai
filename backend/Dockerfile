@@ -9,13 +9,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Non-root user: required by Hugging Face Spaces' Docker SDK, and good
+# practice everywhere else too (Render, docker-compose) -- this Dockerfile
+# is shared across all three deployment targets rather than forked per host.
+RUN useradd -m -u 1000 user
+
 WORKDIR /srv
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY --chown=user . .
 
+# Created (and owned by `user`) AFTER switching accounts below, so the app
+# can actually write to them at runtime (uploaded images, the SQLite file) --
+# creating these as root before the USER switch would leave them
+# unwritable by the non-root process that actually runs the server.
+USER user
 RUN mkdir -p data/uploads ml_pipeline/checkpoints
 
 EXPOSE 8000
