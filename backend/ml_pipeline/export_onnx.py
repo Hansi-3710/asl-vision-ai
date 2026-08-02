@@ -1,5 +1,6 @@
 import torch
 import torchvision.models as models
+import torch.nn as nn
 import os
 
 
@@ -10,20 +11,19 @@ OUTPUT_PATH = "checkpoints/efficientnet_v2_s_baseline/efficientnet_v2_s.onnx"
 device = "cpu"
 
 
-# Create EfficientNetV2-S
+# Create same architecture
 model = models.efficientnet_v2_s(
     weights=None
 )
 
 
 # Replace classifier for 29 ASL classes
-model.classifier[1] = torch.nn.Linear(
-    1280,
+model.classifier[1] = nn.Linear(
+    model.classifier[1].in_features,
     29
 )
 
 
-# Load checkpoint
 checkpoint = torch.load(
     MODEL_PATH,
     map_location=device
@@ -38,13 +38,21 @@ new_state_dict = {}
 
 for key, value in state_dict.items():
     if key.startswith("backbone."):
-        key = key.replace("backbone.", "")
-    new_state_dict[key] = value
+        new_key = key.replace("backbone.", "")
+        new_state_dict[new_key] = value
+    else:
+        new_state_dict[key] = value
 
 
-model.load_state_dict(
-    new_state_dict
+# Load weights
+missing, unexpected = model.load_state_dict(
+    new_state_dict,
+    strict=False
 )
+
+
+print("Missing keys:", missing)
+print("Unexpected keys:", unexpected)
 
 
 model.eval()
@@ -56,6 +64,12 @@ dummy_input = torch.randn(
     3,
     384,
     384
+)
+
+
+os.makedirs(
+    os.path.dirname(OUTPUT_PATH),
+    exist_ok=True
 )
 
 
