@@ -12,6 +12,7 @@ backend/ml_pipeline/checkpoints/*
 backend/ml_pipeline/outputs/
 backend/.env
 backend/*.db
+backend/.venv/
 
 # --- Frontend / Node ---
 frontend/node_modules/

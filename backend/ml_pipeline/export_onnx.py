@@ -7,17 +7,15 @@ import os
 MODEL_PATH = "checkpoints/efficientnet_v2_s_baseline/best.pt"
 OUTPUT_PATH = "checkpoints/efficientnet_v2_s_baseline/efficientnet_v2_s.onnx"
 
-
 device = "cpu"
 
 
-# Create same architecture
 model = models.efficientnet_v2_s(
     weights=None
 )
 
 
-# Replace classifier for 29 ASL classes
+# 29 ASL classes
 model.classifier[1] = nn.Linear(
     model.classifier[1].in_features,
     29
@@ -34,25 +32,23 @@ state_dict = checkpoint["model_state_dict"]
 
 
 # Remove "backbone." prefix
-new_state_dict = {}
+clean_state_dict = {}
 
 for key, value in state_dict.items():
     if key.startswith("backbone."):
-        new_key = key.replace("backbone.", "")
-        new_state_dict[new_key] = value
+        clean_state_dict[key.replace("backbone.", "")] = value
     else:
-        new_state_dict[key] = value
+        clean_state_dict[key] = value
 
 
-# Load weights
-missing, unexpected = model.load_state_dict(
-    new_state_dict,
+result = model.load_state_dict(
+    clean_state_dict,
     strict=False
 )
 
 
-print("Missing keys:", missing)
-print("Unexpected keys:", unexpected)
+print("Missing keys:", result.missing_keys)
+print("Unexpected keys:", result.unexpected_keys)
 
 
 model.eval()
@@ -86,12 +82,8 @@ torch.onnx.export(
     input_names=["image"],
     output_names=["prediction"],
     dynamic_axes={
-        "image": {
-            0: "batch"
-        },
-        "prediction": {
-            0: "batch"
-        }
+        "image": {0: "batch"},
+        "prediction": {0: "batch"}
     }
 )
 
