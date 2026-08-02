@@ -1,5 +1,6 @@
 import torch
 import torchvision.models as models
+import os
 
 
 MODEL_PATH = "checkpoints/efficientnet_v2_s_baseline/best.pt"
@@ -9,13 +10,20 @@ OUTPUT_PATH = "checkpoints/efficientnet_v2_s_baseline/efficientnet_v2_s.onnx"
 device = "cpu"
 
 
-# Original training architecture
+# Create EfficientNetV2-S
 model = models.efficientnet_v2_s(
-    weights=None,
-    num_classes=29
+    weights=None
 )
 
 
+# Replace classifier for 29 ASL classes
+model.classifier[1] = torch.nn.Linear(
+    1280,
+    29
+)
+
+
+# Load checkpoint
 checkpoint = torch.load(
     MODEL_PATH,
     map_location=device
@@ -34,7 +42,9 @@ for key, value in state_dict.items():
     new_state_dict[key] = value
 
 
-model.load_state_dict(new_state_dict)
+model.load_state_dict(
+    new_state_dict
+)
 
 
 model.eval()
