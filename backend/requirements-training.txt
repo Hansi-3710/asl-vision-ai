@@ -1,0 +1,16 @@
+albumentations
+scikit-learn
+scikit-image
+pandas
+matplotlib
+pyyaml
+tqdm
+tensorboard
+thop
+onnxruntime
+onnxscript
+pytest
+pytest-asyncio
+httpx
+black
+flake8

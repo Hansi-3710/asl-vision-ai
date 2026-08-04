@@ -1,0 +1,43 @@
+# Template for a REAL training run against WLASL (https://dxli94.github.io/WLASL/).
+# Not runnable as-is: cache_dir/labels_path/vocab_path must point at the
+# output of landmark_extraction.py run over WLASL's actual video files,
+# which you need to download yourself (dataset-specific license).
+#
+# Model is sized up from the 12-word synthetic config: WLASL has ~2,000
+# gloss classes, so d_model/layers/feedforward are larger to have enough
+# capacity, and max_sequence_length is longer since real signed phrases
+# run longer than the synthetic generator's toy clips.
+name: landmark_transformer_wlasl
+data:
+  cache_dir: data/wlasl_cache          # output of landmark_extraction.py
+  labels_path: data/wlasl_cache/labels.json
+  vocab_path: data/wlasl_cache/vocab.json
+  feature_dim: 258
+  max_sequence_length: 128
+  train_split: 0.85
+  val_split: 0.15
+  split_seed: 42
+model:
+  architecture: landmark_transformer
+  d_model: 256
+  num_encoder_layers: 6
+  num_heads: 8
+  dim_feedforward: 1024
+  dropout: 0.2
+  max_position_embeddings: 256
+optim:
+  optimizer: adamw
+  lr: 0.0001
+  weight_decay: 0.0001
+  scheduler: cosine
+  grad_clip_norm: 5.0
+train:
+  batch_size: 32
+  epochs: 100
+  early_stopping_patience: 10
+  num_workers: 4
+  seed: 0
+  device: auto
+  log_every_n_steps: 20
+  checkpoint_dir: checkpoints/landmark_transformer_wlasl
+  resume_from: null
