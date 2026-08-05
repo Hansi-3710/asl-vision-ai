@@ -16,6 +16,7 @@ torchvision==0.18.1
 # runtimes by design, not by accident.
 onnxruntime==1.18.0
 pyyaml==6.0.1
+albumentations
 
 # Computer vision
 opencv-python-headless==4.9.0.80
