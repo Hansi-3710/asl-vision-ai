@@ -1,0 +1,2 @@
+backend/ml_pipeline/checkpoints/**/*.pt filter=lfs diff=lfs merge=lfs -text
+backend/ml_pipeline/checkpoints/efficientnet_v2_s_baseline/best.pt filter=lfs diff=lfs merge=lfs -text

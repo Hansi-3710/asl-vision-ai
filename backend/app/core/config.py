@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     # "not real ASL yet" banner.
     SEQUENCE_MODEL_ONNX_PATH: str = "continuous_pipeline/checkpoints/landmark_transformer_synthetic/model.onnx"
     SEQUENCE_MODEL_VOCAB_PATH: str = "continuous_pipeline/checkpoints/landmark_transformer_synthetic/vocab.json"
-    SEQUENCE_MODEL_IS_PLACEHOLDER: bool = True
+    SEQUENCE_MODEL_IS_PLACEHOLDER: bool = False
     # How many landmark frames the session buffer keeps before the oldest
     # frames start dropping off (600 frames @ ~15fps client sampling ~= 40s
     # of continuous signing before earlier words scroll out of the live
