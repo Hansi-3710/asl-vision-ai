@@ -381,49 +381,6 @@ Documented explicitly here rather than left implicit in the code:
 - **Continuous recognition uses greedy CTC decoding**, not beam search --
   simpler, and there's no "top-3 alternatives" without beam search anyway.
 
-## Known Limitations
-
-- Hand detection and classification are two separate models; a low-quality
-  detection (bad lighting, unusual angle) affects the crop fed to the
-  classifier even before classification itself runs.
-- The live camera polls the backend on a fixed interval (900ms) rather than
-  every frame, by design -- see `hooks/use-webcam-prediction.ts` for the
-  reasoning.
-- The alphabet classifier only recognizes static, isolated letters -- not
-  full ASL. (This is exactly what continuous recognition, below, exists
-  to move past -- see its own caveats there.)
-- **Continuous recognition's bundled model has not been trained on real
-  sign language** (synthetic placeholder data only -- see
-  [Continuous Recognition](#continuous-recognition)). Expect it to output
-  confident-looking nonsense against a real webcam until you train it on
-  WLASL/How2Sign.
-- Continuous recognition's sentence post-processing is rule-based
-  (capitalization + punctuation), not a language model -- it won't insert
-  missing grammar words a real translation would need.
-- Continuous recognition re-decodes its entire buffer on every inference
-  tick rather than doing true incremental streaming decode -- fine at the
-  buffer sizes used here, but compute cost grows with how long a single
-  conversation runs before a reset.
-
-## Future Improvements
-
-- **Train the continuous recognizer on real data** (WLASL/How2Sign) --
-  by far the highest-impact item; everything else in this list is
-  secondary to actually having a model that recognizes real signs.
-- Beam search (instead of greedy) CTC decoding for continuous recognition,
-  enabling genuine top-k alternative predictions per word.
-- True incremental/chunked streaming decode for continuous recognition,
-  replacing the current whole-buffer re-decode, so per-tick compute cost
-  stays flat as a conversation runs longer.
-- Swap continuous recognition's rule-based sentence post-processing for an
-  LLM call (the function is already isolated specifically for this --
-  see `postprocess_transcript()` in `app/ml/sequence_recognizer.py`).
-- Facial-landmark features (yes/no questions, negation, topic marking) for
-  continuous recognition -- currently pose + hands only.
-- A `/predict` response cache keyed on perceptual image hash, to skip
-  redundant inference on near-identical consecutive alphabet webcam frames.
-- Alembic migrations if the schema grows beyond the current single table.
-
 ## License
 
 MIT (code). The ASL Alphabet Dataset has its own license terms on Kaggle --
